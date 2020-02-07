@@ -140,6 +140,7 @@ def purchaseorderconfirmation(request):
             'title': 'Purchase Order Confirmation',
             'quotation_id' : quotation_id,
             'purchase_order_id' : po_id,
+            'staff_id' : staff.person_id,
             'vendor_id' : vendor_id,
             'shipping_inst' : shipping_inst,
             'grand_total': grand_total,
