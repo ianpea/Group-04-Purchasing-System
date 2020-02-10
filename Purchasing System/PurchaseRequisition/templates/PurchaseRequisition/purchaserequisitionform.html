@@ -22,6 +22,43 @@
     });
 </script>
 
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#submit").click(function () {
+            var tableRows = document.getElementById("tab_logic").rows
+
+            if (tableRows.length <= 2) {
+                alert("The Form is Empty.");
+                return false;
+            }
+
+            for (i = 1; i < tableRows.length; i++) {
+                var myrow = tableRows[i];
+
+                var a = myrow.cells[1].childNodes[0].value;
+                var b = myrow.cells[2].childNodes[0].value;
+                var c = myrow.cells[3].childNodes[0].value;
+                var d = myrow.cells[4].childNodes[0].value;
+                var e = myrow.cells[5].childNodes[0].value;
+
+                if (a == null || a == "" || b == null || b == "" || c == null || c == "" || d == null || d == "" || e == null || e == "") {
+                    alert("Please Fill All Required Field.");
+                    return false;
+                }
+                else if (isNaN(d)) {
+                    alert("Quantity Field Must Be In Numeric.");
+                    return false;
+                }
+                else if (isNaN(e)) {
+                    alert("Price Field Must Be In Numeric.");
+                    return false;
+                }
+
+            }
+        });
+    });
+</script>
+
 {% endblock %}
 
 {% block content %}
@@ -58,11 +95,11 @@
 				<tbody name="item_rows">
 					<tr id='addr0'>
 						<td>1</td>
-                        <td> <input type="text" name='item_id' placeholder='Item id'  class="form-control" /> </td>
-						<td><input type="text" name="item_name"  placeholder='Item name' class="form-control" ></td>
-						<td><input type="text" name='description' placeholder='Description' class="form-control" /></td>
-                        <td><input type="text" name='quantity' placeholder='Quantity'  class="form-control" /></td>
-                        <td><input type="text" name='unit_price' placeholder='Price Per Unit'  class="form-control"  /></td>
+                        <td><input type="text" id='item_id' name='item_id' placeholder='Item id'  class="form-control" /> </td>
+						<td><input type="text" id='item_name' name="item_name"  placeholder='Item name' class="form-control" ></td>
+						<td><input type="text" id='description' name='description' placeholder='Description' class="form-control" /></td>
+                        <td><input type="text" id='quantity' name='quantity' placeholder='Quantity'  class="form-control" /></td>
+                        <td><input type="text" id='unit_price' name='unit_price' placeholder='Price Per Unit'  class="form-control"  /></td>
 					</tr> 
                     <tr id='addr1'></tr>
                
@@ -73,7 +110,7 @@
 	    <a id="add_row" class="btn btn-default pull-left">Add Item</a><a id='delete_row' class="pull-right btn btn-default">Delete Item</a>
        
         <div class="margintop">
-            <button type="submit" class="btn btn-success btn-square buttonsize">Submit</button>
+            <button id="submit" type="submit" class="btn btn-success btn-square buttonsize">Submit</button>
             <a class="btn btn-danger btn-square buttonsize" href="/menu">Cancel</a>
         </div>
 
