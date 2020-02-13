@@ -14,6 +14,7 @@ class Quotation(models.Model):
     person_id = models.ForeignKey(Person, on_delete = models.CASCADE)
     vendor_id = models.ForeignKey(Vendor, on_delete = models.CASCADE)
     request_for_quotation_id = models.OneToOneField(RequestForQuotation, on_delete = models.CASCADE)
+    status = models.TextField(max_length=10, default="Pending")
     def __str__(self):
         return str(self.quotation_id)
 
