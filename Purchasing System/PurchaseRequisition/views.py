@@ -197,6 +197,10 @@ def purchaserequisitionhistorydetails(request):
     items = PurchaseRequisitionItem.objects.all().filter(pr_id = pk)
 
     print(purchase_requisition.person_id)
+
+    for item in items:
+        total= Decimal(item.quantity) * Decimal(item.unit_price)
+        item.total_price = total
     
     context = {
 
