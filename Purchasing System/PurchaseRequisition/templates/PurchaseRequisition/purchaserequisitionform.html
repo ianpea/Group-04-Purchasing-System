@@ -1,27 +1,89 @@
 ﻿{% extends "app/layout.html" %}
 
-{% block content %}
+{% block scripts %}
 
 <script>
     $(document).ready(function () {
 
-     
-      var i=1;
-     $("#add_row").click(function(){
-      $('#addr'+i).html("<td>"+ (i+1) +"</td><td><input name='item_id' type='item_id' placeholder='Item ID' class='form-control input-md'   /> </td><td><input  name='item_name' type='text' placeholder='Item Name'  class='form-control input-md'></td><td><input  name='description' type='text' placeholder='Description'  class='form-control input-md' ></td><td><input name='quantity' type='text' placeholder='Quantity' class='form-control input-md'  /> </td><td><input name='unit_price' type='text' placeholder='Price Per Unit' class='form-control input-md'  /> </td>");
+        var i = 1;
+        var j = 1;
+        $("#add_row").click(function(){
+            $('#addr'+i).html("<td>"+ (j+1) +"</td><td><input name='item_id' type='item_id' placeholder='Item ID' class='form-control input-md'   /> </td><td><input  name='item_name' type='text' placeholder='Item Name'  class='form-control input-md'></td><td><input  name='description' type='text' placeholder='Description'  class='form-control input-md' ></td><td><input name='quantity' type='text' placeholder='Quantity' class='form-control input-md'  /> </td><td><input name='unit_price' type='text' placeholder='Price Per Unit' class='form-control input-md'  /><td style='text-align: center; vertical-align: middle;'><input type='checkbox' class='check_box'/></td> </td>");
+            $('#tab_logic').append('<tr id="addr'+(i+1)+'"></tr>');
+            i++;
+            j++;
+        });
 
-      $('#tab_logic').append('<tr id="addr'+(i+1)+'"></tr>');
-      i++; 
-  });
-     $("#delete_row").click(function(){
-    	 if(i>1){
-		 $("#addr"+(i-1)).html('');
-		 i--;
-		 }
-	 });
+        $("#delete_row").click(function(){
+    	    /*if(i>1){
+		        $("#addr"+(i-1)).html('');
+		        i--;
+		    }*/
+            var check = $('#dataRow').children('tr').find('input[type=checkbox]:checked').length;
+            if (check == 0) {
+                alert("Please select item to delete.");
+                return false;
+            }
+            j = j - check;
+            
+            $('#dataRow').children('tr').find('input[type=checkbox]:checked').each(function () {
+                $(this).closest('tr').remove();
+            });
+            
+            var tableRows = document.getElementById("tab_logic").rows;
+            
+            var index = tableRows.length;
+            for (var n = 1; n <= index; n++) {
+                
+                var myrow = tableRows[n];
+                myrow.cells[0].innerHTML = n;
+               
+            }
+	    });
 
-});
+    });
 </script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#submit").click(function () {
+            var tableRows = document.getElementById("tab_logic").rows
+
+            if (tableRows.length <= 2) {
+                alert("The Form is Empty.");
+                return false;
+            }
+
+            for (i = 1; i < tableRows.length; i++) {
+                var myrow = tableRows[i];
+
+                var a = myrow.cells[1].childNodes[0].value;
+                var b = myrow.cells[2].childNodes[0].value;
+                var c = myrow.cells[3].childNodes[0].value;
+                var d = myrow.cells[4].childNodes[0].value;
+                var e = myrow.cells[5].childNodes[0].value;
+
+                if (a == null || a == "" || b == null || b == "" || c == null || c == "" || d == null || d == "" || e == null || e == "") {
+                    alert("Please Fill All Required Field.");
+                    return false;
+                }
+                else if (isNaN(d)) {
+                    alert("Quantity Field Must Be In Numeric.");
+                    return false;
+                }
+                else if (isNaN(e)) {
+                    alert("Price Field Must Be In Numeric.");
+                    return false;
+                }
+
+            }
+        });
+    });
+</script>
+
+{% endblock %}
+
+{% block content %}
 <div class="formpurchaseorder margintop" >
 
     <form class="purchaseordersubmission" action="purchaserequisitionconfirmation" method="POST">
@@ -50,16 +112,18 @@
                         <th class="text-center">Description</th>
 						<th class="text-center">Quantity</th>
                         <th class="text-center">Price Per Unit</th>
+                        <th></th>
 					</tr>
 				</thead>
-				<tbody name="item_rows">
+				<tbody name="item_rows" id="dataRow">
 					<tr id='addr0'>
 						<td>1</td>
-                        <td> <input type="text" name='item_id' placeholder='Item id'  class="form-control" /> </td>
-						<td><input type="text" name="item_name"  placeholder='Item name' class="form-control" ></td>
-						<td><input type="text" name='description' placeholder='Description' class="form-control" /></td>
-                        <td><input type="text" name='quantity' placeholder='Quantity'  class="form-control" /></td>
-                        <td><input type="text" name='unit_price' placeholder='Price Per Unit'  class="form-control"  /></td>
+                        <td><input type="text" id='item_id' name='item_id' placeholder='Item id'  class="form-control" /> </td>
+						<td><input type="text" id='item_name' name="item_name"  placeholder='Item name' class="form-control" ></td>
+						<td><input type="text" id='description' name='description' placeholder='Description' class="form-control" /></td>
+                        <td><input type="text" id='quantity' name='quantity' placeholder='Quantity'  class="form-control" /></td>
+                        <td><input type="text" id='unit_price' name='unit_price' placeholder='Price Per Unit'  class="form-control"  /></td>
+                        <td style="text-align: center; vertical-align: middle;"><input type='checkbox' class='check_box'/></td>
 					</tr> 
                     <tr id='addr1'></tr>
                
@@ -70,7 +134,7 @@
 	    <a id="add_row" class="btn btn-default pull-left">Add Item</a><a id='delete_row' class="pull-right btn btn-default">Delete Item</a>
        
         <div class="margintop">
-            <button type="submit" class="btn btn-success btn-square buttonsize">Submit</button>
+            <button id="submit" type="submit" class="btn btn-success btn-square buttonsize">Submit</button>
             <a class="btn btn-danger btn-square buttonsize" href="/menu">Cancel</a>
         </div>
 
