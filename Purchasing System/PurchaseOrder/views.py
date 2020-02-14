@@ -29,8 +29,11 @@ from django.conf import settings
 
 @login_required
 def purchaseorderform(request):
+    quo_id_list = Quotation.objects.all()
+    
     context = {
             'title':'Purchase Order Form',
+            'quo_id_list': quo_id_list,
             'year':'2019/2020'
         }
 
@@ -43,6 +46,7 @@ def fillingpurchaseorder(request):
     context = {}
     quo_id = request.GET['quo_id']
     po_id = 1001
+    quo_id_list = Quotation.objects.all()
 
     purchaseorders = PurchaseOrder.objects.all()
     numberpo = len(purchaseorders)
@@ -57,7 +61,9 @@ def fillingpurchaseorder(request):
         print(purchaseorder)
 
         context = { 'error': 'The purchase order is already Issued! Purchase Order Number: ' + purchaseorder.purchase_order_id,
-                    'title': 'Purchase Order Form'
+                    'title': 'Purchase Order Form',
+                    'quo_id_list': quo_id_list,
+                    'current_selected_id': quo_id
             }
         return render(request,'PurchaseOrder/purchaseorderform.html',context)
 
@@ -68,6 +74,8 @@ def fillingpurchaseorder(request):
             item_list = QuotationItem.objects.filter(quotation_id = quo_id)
             context = {
                     'title': 'Purchase Order Form',
+                    'quo_id_list': quo_id_list,
+                    'current_selected_id': quo_id,
                     'purchase_order_id': 'PO' + str(po_id),
                     'quotation_id': quo_id, 
                     'staff' : staff,
@@ -81,7 +89,9 @@ def fillingpurchaseorder(request):
         except Quotation.DoesNotExist:
 
             context = { 'error': 'The quotation id is invalid !',
-                        'title': 'Purchase Order Form'
+                        'title': 'Purchase Order Form',
+                        'quo_id_list': quo_id_list,
+                        'current_selected_id': quo_id
                 }
             return render(request,'PurchaseOrder/purchaseorderform.html',context)
 

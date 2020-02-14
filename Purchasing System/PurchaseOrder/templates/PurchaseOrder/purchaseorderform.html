@@ -4,17 +4,28 @@
 <div class="formpurchaseorder margintop" >
     <form class="quotationfind" action="fillingpurchaseorder" method="get">
 
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" name="quo_id" id="quo_id" placeholder="Quotation ID" aria-label="Quotation ID"
-            aria-describedby="button-addon2">
-          <div class="input-group-append">
-           <button type="submit" class="btn btn-outline-info btn-hover btn-rounded waves-effect">Find</button>
-          </div>
-        </div>
+        <table>
+            <tr>
+                <td><b>Quotation ID: </b></td>
+                <td>
+                    <select class="form-control" name="quo_id" id="quo_id" placeholder="Quotation ID" aria-label="Quotation ID" aria-describedby="button-addon2" >
+                        <option value=""></option>
+                        {% for item in quo_id_list %}
+                        <option value="{{ item.quotation_id }}" {% if current_selected_id == item.quotation_id %} selected {% endif %} >{{ item.quotation_id }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-outline-info btn-hover btn-rounded waves-effect">Find</button>
+                    </div>
+                </td>
+            </tr>
+        </table>
 
 
     </form>
-    <p>{{error}}</p>
+    {% if error != "" %} <p>{{error}}</p> {% endif %}
 
     <form class="purchaseordersubmission" action="purchaseorderconfirmation" method="POST">
         {% csrf_token %}
