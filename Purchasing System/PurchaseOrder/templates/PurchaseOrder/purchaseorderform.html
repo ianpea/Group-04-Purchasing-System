@@ -1,26 +1,51 @@
 {% extends "app/layout.html" %}
 
+{% block scripts %}
+
+<script>
+    function validateForm() {
+        var p_id = document.getElementById("purch_id").value;
+        if (p_id == "") {
+            alert("Please enter Quotation ID!");
+            return false;
+        }
+    }
+</script>
+
+{% endblock %}
+
 {% block content %}
 <div class="formpurchaseorder margintop" >
     <form class="quotationfind" action="fillingpurchaseorder" method="get">
 
-        <div class="input-group mb-3">
-          <input type="text" class="form-control" name="quo_id" id="quo_id" placeholder="Quotation ID" aria-label="Quotation ID"
-            aria-describedby="button-addon2">
-          <div class="input-group-append">
-           <button type="submit" class="btn btn-outline-info btn-hover btn-rounded waves-effect">Find</button>
-          </div>
-        </div>
+        <table>
+            <tr>
+                <td><b>Quotation ID: </b></td>
+                <td>
+                    <select class="form-control" name="quo_id" id="quo_id" placeholder="Quotation ID" aria-label="Quotation ID" aria-describedby="button-addon2" >
+                        <option value=""></option>
+                        {% for item in quo_id_list %}
+                        <option value="{{ item.quotation_id }}" {% if current_selected_id == item.quotation_id %} selected {% endif %} >{{ item.quotation_id }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-outline-info btn-hover btn-rounded waves-effect">Find</button>
+                    </div>
+                </td>
+            </tr>
+        </table>
 
 
     </form>
-    <p>{{error}}</p>
+    {% if error != "" %} <p>{{error}}</p> {% endif %}
 
-    <form class="purchaseordersubmission" action="purchaseorderconfirmation" method="POST">
+    <form class="purchaseordersubmission" action="purchaseorderconfirmation" onsubmit="return validateForm()" method="POST">
         {% csrf_token %}
         <div class="row margintop">
             <div class="col">
-                <input type="text" class="form-control" name="purchase_order_id" value="{{purchase_order_id}}" placeholder="Purchase Order ID">
+                <input type="text" class="form-control" name="purchase_order_id" id="purch_id" value="{{purchase_order_id}}" placeholder="Purchase Order ID" readonly>
             </div>
             <div class="col">
                 <textarea type="text" class="poform-control" name="quotation_id" placeholder="Quotation ID" readonly>{{quotation_id}}</textarea>
@@ -65,7 +90,7 @@
             </tbody>
         </table>
         <div class="margintop">
-            <button type="submit" class="btn btn-success btn-square buttonsize">Submit</button>
+            <button id="submit" type="submit" class="btn btn-success btn-square buttonsize">Submit</button>
             <a class="btn btn-danger btn-square buttonsize" href="/menu">Cancel</a>
         </div>
 

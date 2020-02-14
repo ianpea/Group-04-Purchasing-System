@@ -1,5 +1,21 @@
 {% extends "app/layout.html" %}
 
+{% block scripts %}
+<script>
+    {% if message == "email send failed" %}
+        $(document).ready(function(){
+            alert('Your purchase order has been issued! However, error occured when system attempts to send e-mail to the vendor!');
+        });
+    {% endif %}
+
+    {% if message == "email sent" %}
+        $(document).ready(function(){
+            alert('Your purchase order has been created! An e-mail has been sent to the vendor!');
+        });
+    {% endif %}
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="formpurchaseorder" >
     
