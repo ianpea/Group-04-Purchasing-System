@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
 from django.http import HttpRequest, HttpResponseRedirect
 from django.template import RequestContext
-from django.db import models
+from django.db import models, IntegrityError
 from datetime import datetime
 
 #database
@@ -34,7 +34,8 @@ def purchaseorderform(request):
     context = {
             'title':'Purchase Order Form',
             'quo_id_list': quo_id_list,
-            'year':'2019/2020'
+            'year':'2019/2020',
+            'error': ''
         }
 
     return render(request,'PurchaseOrder/purchaseorderform.html',context)
@@ -74,6 +75,7 @@ def fillingpurchaseorder(request):
             item_list = QuotationItem.objects.filter(quotation_id = quo_id)
             context = {
                     'title': 'Purchase Order Form',
+                    'error': '',
                     'quo_id_list': quo_id_list,
                     'current_selected_id': quo_id,
                     'purchase_order_id': 'PO' + str(po_id),
@@ -243,36 +245,59 @@ def purchaseorderdetails(request):
 
 
     #sending email to vendor
-    x = PrettyTable()
+    try:
+        x = PrettyTable()
 
-    x.field_names = ["Item ID","Item Name","Quantity","Unit Price","Total Price"]
+        x.field_names = ["Item ID","Item Name","Quantity","Unit Price","Total Price"]
 
-    for item in items:
-        x.add_row([item['item_id'],item['item_name'],item['quantity'],item['unit_price'],item['total_price']])
+        for item in items:
+            x.add_row([item['item_id'],item['item_name'],item['quantity'],item['unit_price'],item['total_price']])
 
-    subject = 'PURCHASE ORDER INFORMATION: '+ po_id
-    message = 'This is the Purchase Order Information: \n'+'Person In Charge: '+staff.person_name+'\n'+'Ship to:'+staff.person_address+ '\n' +'Purchase Order Number: ' + po_id + '\n'+'Quotation ID: ' + quotation.quotation_id + '\n'+'Time Issued: ' + str(current_time) + '\n'+'Vendor ID: ' + vendor_id + '\n'+'Description: ' + description + '\n'+'Shipping Instructions: ' + shipping_inst + '\n'+ str(x) +'\n'
+        subject = 'PURCHASE ORDER INFORMATION: '+ po_id
+        message = 'This is the Purchase Order Information: \n'+'Person In Charge: '+staff.person_name+'\n'+'Ship to:'+staff.person_address+ '\n' +'Purchase Order Number: ' + po_id + '\n'+'Quotation ID: ' + quotation.quotation_id + '\n'+'Time Issued: ' + str(current_time) + '\n'+'Vendor ID: ' + vendor_id + '\n'+'Description: ' + description + '\n'+'Shipping Instructions: ' + shipping_inst + '\n'+ str(x) +'\n'
 
-    email_from = settings.EMAIL_HOST_USER
-    recipient_list = [vendor_info.vendor_email,]
-    send_mail( subject, message, email_from, recipient_list )
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [vendor_info.vendor_email,]
+        send_mail( subject, message, email_from, recipient_list )
 
-    # info pass to html
-    context = {
-            'title': 'Purchase Order Details',
-            'quotation_id' : quotation_id,
-            'purchase_order_id' : po_id,
-            'vendor_id' : vendor_id,
-            'shipping_inst' : shipping_inst,
-            'rows' : items,
-            'staff' : staff,
-            'vendor_info' : vendor_info,
-            'grand_total': grand_total,
-            'time_created': current_time,
-            'description' : description
-        }
+        # info pass to html
+        context = {
+                'title': 'Purchase Order Details',
+                'quotation_id' : quotation_id,
+                'purchase_order_id' : po_id,
+                'vendor_id' : vendor_id,
+                'shipping_inst' : shipping_inst,
+                'rows' : items,
+                'staff' : staff,
+                'vendor_info' : vendor_info,
+                'grand_total': grand_total,
+                'time_created': current_time,
+                'description' : description,
+                'message': 'email sent'
+            }
 
-    return render(request,'PurchaseOrder/purchaseorderdetails.html',context)
+        return render(request,'PurchaseOrder/purchaseorderdetails.html',context)
+
+    except IntegrityError:
+        return render(request,'PurchaseOrder/purchaseorderdetails.html',context)
+
+    except ConnectionRefusedError:
+         context = {
+                'title': 'Purchase Order Details',
+                'quotation_id' : quotation_id,
+                'purchase_order_id' : po_id,
+                'vendor_id' : vendor_id,
+                'shipping_inst' : shipping_inst,
+                'rows' : items,
+                'staff' : staff,
+                'vendor_info' : vendor_info,
+                'grand_total': grand_total,
+                'time_created': current_time,
+                'description' : description,
+                'message': 'email send failed'
+            }
+         return render(request,'PurchaseOrder/purchaseorderdetails.html',context)
+
 
 def purchaseorderhistorydetails(request):
 
