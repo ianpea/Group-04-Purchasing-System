@@ -1,5 +1,20 @@
 ﻿{% extends "app/layout.html" %}
 
+
+{% block scripts %}
+
+<script>
+    function validateForm() {
+        var d_id = document.getElementById("del_id").value;
+        if (d_id == "") {
+            alert("Please enter Purchase Order ID!");
+            return false;
+        }
+    }
+</script>
+
+{% endblock %}
+
 {% block content %}
 <div class="formpurchaseorder margintop" >
     <form class="quotationfind" action="fillingdeliveryorder" method="get">
@@ -25,11 +40,11 @@
     
     {% if error != "" %} <p>{{error}}</p> {% endif %}
 
-    <form class="purchaseordersubmission" action="deliveryorderconfirmation" method="POST">
+    <form class="purchaseordersubmission" action="deliveryorderconfirmation" onsubmit="return validateForm()" method="POST">
         {% csrf_token %}
         <div class="row margintop">
             <div class="col">
-                <input type="text" class="form-control" name="delivery_order_id" value="{{delivery_order_id}}" placeholder="Delivery Order ID">
+                <input type="text" class="form-control" name="delivery_order_id" id="del_id" value="{{delivery_order_id}}" placeholder="Delivery Order ID" readonly>
             </div>
             <div class="col">
                 <textarea type="text" class="poform-control" name="purchase_order_id" placeholder="Purchase_Order_ID">{{purchase_order_id}}</textarea>
@@ -74,7 +89,7 @@
             </tbody>
         </table>
         <div class="margintop">
-            <button type="submit" class="btn btn-success btn-square buttonsize">Submit</button>
+            <button id="submit" type="submit" class="btn btn-success btn-square buttonsize">Submit</button>
             <a class="btn btn-danger btn-square buttonsize" href="/menu">Cancel</a>
         </div>
 
