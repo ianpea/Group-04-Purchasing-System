@@ -47,6 +47,14 @@ def about(request):
         }
     )
 
+def menu(request):
+    """Renders the menu page."""
+    assert isinstance(request, HttpRequest)
+    return render(
+        request,
+        'app/menu.html'
+    )
+
 @login_required
 def menu(request):
     check_employee = request.user.groups.filter(name='employee').exists()
